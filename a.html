@@ -2,47 +2,39 @@
 <html lang="ja">
 <head>
 <meta charset="utf-8">
-<title>360度背景 - 月山 (Apple Vision Pro最適化)</title>
+<title>360度背景 - 月山 (Vision Pro 安定版)</title>
 <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
 <style>
-  html, body { margin: 0; height: 100%; overflow: hidden; background-color: black; }
+  html, body { margin: 0; height: 100%; overflow: hidden; background: black; }
 </style>
 </head>
 <body>
 
 <a-scene
-  renderer="antialias: true; precision: highp; physicallyCorrectLights: true; logarithmicDepthBuffer: true;"
-  xr-mode-ui="enabled: true"
+  renderer="antialias: true; precision: highp;"
   vr-mode-ui="enabled: true"
-  embedded
+  xr-mode-ui="enabled: true"
 >
-  <!-- 高解像度の360度画像を使用（8K以上を推奨） -->
-  <a-sky id="sky" src="gassan_8k.webp" rotation="0 -90 0"></a-sky>
+  <!-- JPGまたはPNGでテスト -->
+  <a-sky id="sky" src="gassan.jpeg" rotation="0 -90 0"></a-sky>
 
-  <!-- カメラ操作（Vision Proでのヘッドトラッキング対応） -->
-  <a-entity id="cameraRig">
-    <a-entity id="camera" camera look-controls></a-entity>
-  </a-entity>
+  <a-entity camera look-controls position="0 1.6 0"></a-entity>
 </a-scene>
 
 <script>
-  // 高解像度・異方性フィルタリングの設定
   document.querySelector('a-scene').addEventListener('loaded', () => {
     const skyEl = document.querySelector('#sky');
     const mesh = skyEl.getObject3D('mesh');
     if (mesh && mesh.material.map) {
       const texture = mesh.material.map;
-      texture.anisotropy = 16; // 高品質フィルタリング
-      texture.minFilter = THREE.LinearFilter;
-      texture.magFilter = THREE.LinearFilter;
+      texture.anisotropy = 8; // 16でもOKだが安定性重視で8
       texture.needsUpdate = true;
     }
 
-    // Vision Pro対応: 高精細レンダリング
     const renderer = document.querySelector('a-scene').renderer;
     if (renderer) {
-      renderer.setPixelRatio(window.devicePixelRatio * 1.5); // Retina超解像
-      renderer.outputEncoding = THREE.sRGBEncoding; // カラー精度向上
+      renderer.outputEncoding = THREE.sRGBEncoding; // 正しい色空間
+      renderer.setPixelRatio(window.devicePixelRatio); // 安定倍率
     }
   });
 </script>
